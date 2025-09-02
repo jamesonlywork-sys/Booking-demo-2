@@ -3,24 +3,23 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Booking.bt — Check‑in</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Booking.bt — Check-in</title>
+  <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
   <header class="header">
     <div class="container" style="display:flex;align-items:center;justify-content:space-between;">
-      <div class="brand">Booking<span style="color:var(--accent)">.bt</span></div>
+      <div class="brand"><img src="/assets/logo.svg" alt="Booking.bt logo"/></div>
       <nav class="nav">
-        <a href="index.html#events">Events</a>
-        <a href="index.html#book">Book</a>
-        <a href="checkin.html">Check‑in</a>
+        <a href="/">Home</a>
+        <a href="/checkin">Check-in</a>
       </nav>
     </div>
   </header>
 
   <main class="container section">
-    <h2>Check‑in</h2>
-    <p class="notice">Enter a Ticket ID or scan the QR with your phone’s camera and paste the ID here. This validates against tickets created on this device (demo mode).</p>
+    <h2>Check-in</h2>
+    <p class="notice">Paste a Ticket ID to validate. (Demo validates tickets created on this device.)</p>
 
     <form id="checkForm" class="form">
       <label for="ticketId">Ticket ID</label>
@@ -29,48 +28,24 @@
         <button type="submit" class="btn primary">Validate</button>
         <button id="markUsed" type="button" class="btn">Mark as used</button>
       </div>
-      <p class="helper">Tip: Create a ticket on the Book page first, then validate it here.</p>
+      <p class="small">Tip: Create a ticket on the homepage first.</p>
     </form>
 
     <div id="result" class="card" style="display:none;margin-top:16px;">
-      <div class="kicker">Result</div>
-      <h3 id="rHeadline">—</h3>
-      <table class="table">
-        <tr><th>Ticket ID</th><td id="rId">—</td></tr>
-        <tr><th>Event</th><td id="rEvent">—</td></tr>
-        <tr><th>Name</th><td id="rName">—</td></tr>
-        <tr><th>Qty</th><td id="rQty">—</td></tr>
-        <tr><th>Status</th><td id="rStatus">—</td></tr>
-      </table>
+      <div class="pad">
+        <h3 id="rHeadline">—</h3>
+        <table class="table">
+          <tr><th>Ticket ID</th><td id="rId">—</td></tr>
+          <tr><th>Event</th><td id="rEvent">—</td></tr>
+          <tr><th>Name</th><td id="rName">—</td></tr>
+          <tr><th>Qty</th><td id="rQty">—</td></tr>
+          <tr><th>Status</th><td id="rStatus">—</td></tr>
+        </table>
+      </div>
     </div>
-
-    <section class="section">
-      <h3>Recently created tickets (this device)</h3>
-      <div id="recent" class="grid"></div>
-    </section>
   </main>
 
   <footer class="footer">Demo only • © Booking.bt</footer>
-  <script src="app.js"></script>
-  <script>
-    // Populate recent tickets
-    window.addEventListener('DOMContentLoaded', function(){
-      const recent = document.getElementById('recent');
-      const store = window.bt.store();
-      if (!store.length) {
-        recent.innerHTML = '<div class="card"><div class="meta">No tickets yet. Create one on the Book page.</div></div>';
-        return;
-      }
-      recent.innerHTML = '';
-      store.slice().reverse().slice(0,6).forEach(t => {
-        const el = document.createElement('article');
-        el.className = 'card';
-        el.innerHTML = '<h3>'+t.event+'</h3>' +
-                       '<div class="meta">'+t.name+' • '+t.qty+' tix</div>' +
-                       '<div class="small" style="margin-top:6px">ID: '+t.id+' — ' + (t.used ? '<span class="used">Used</span>' : '<span class="valid">Valid</span>') + '</div>';
-        recent.appendChild(el);
-      });
-    });
-  </script>
+  <script src="/app.js"></script>
 </body>
 </html>

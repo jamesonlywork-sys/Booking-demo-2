@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Booking.bt — Payment Success</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;">
+      <div class="brand"><img src="/assets/logo.svg" alt="Booking.bt logo"/></div>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/checkin">Check-in</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container section">
+    <h2>Payment Success (Demo)</h2>
+    <p class="notice">We’re generating your ticket now. If email is enabled, it will arrive shortly.</p>
+    <div id="ticket" class="card" style="display:none;margin-top:16px;">
+      <div class="pad">
+        <h3>Ticket details</h3>
+        <table class="table">
+          <tr><th>Ticket ID</th><td id="tId">—</td></tr>
+          <tr><th>Event</th><td id="tEvent">—</td></tr>
+          <tr><th>Name</th><td id="tName">—</td></tr>
+          <tr><th>Qty</th><td id="tQty">—</td></tr>
+          <tr><th>Status</th><td><span class="valid">Valid</span></td></tr>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Read info from URL (provided by app.js when simulating, or by Stripe success redirect with query params)
+    const params = new URLSearchParams(location.search);
+    const id = params.get('id');
+    const eventName = params.get('event');
+    const name = params.get('name');
+    const email = params.get('email');
+    const qty = params.get('qty') || '1';
+
+    async function sendEmail(){
+      try {
+        const res = await fetch('/api/email-ticket', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, event: eventName, name, email, qty })
+        });
+        console.log('Email status', await res.json());
+      } catch(e){ console.error('Email error', e); }
+    }
+
+    if (id && eventName){
+      document.getElementById('ticket').style.display = 'block';
+      document.getElementById('tId').textContent = id;
+      document.getElementById('tEvent').textContent = eventName;
+      document.getElementById('tName').textContent = name || '—';
+      document.getElementById('tQty').textContent = qty;
+      // Try to send an email (if RESEND_API_KEY is set on Vercel)
+      if (email){ sendEmail(); }
+    }
+  </script>
+</body>
+</html>

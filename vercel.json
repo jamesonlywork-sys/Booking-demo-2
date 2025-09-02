@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "routes": [
+    { "src": "/", "dest": "/index.html" },
+    { "src": "/success", "dest": "/success.html" },
+    { "src": "/checkin", "dest": "/checkin.html" },
+    { "src": "/api/email-ticket", "dest": "/api/email-ticket.js" }
+  ]
+}

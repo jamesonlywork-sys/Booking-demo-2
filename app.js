@@ -1,55 +1,68 @@
-// Booking.bt demo logic (no backend).
-// - Generates Ticket IDs like BT-XXXXXXXX
-// - Saves tickets to localStorage
-// - Renders QR code containing {ticket_id, event, name, qty}
-
+// Pro Demo logic
 (function(){
-  const KEY = 'bookingbt_tickets_v1';
+  const KEY = 'bookingbt_tickets_v2';
 
-  function load(){
-    try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch(e){ return []; }
-  }
-  function save(arr){
-    localStorage.setItem(KEY, JSON.stringify(arr));
-  }
-  function genId(){
-    return 'BT-' + Math.random().toString(36).slice(2,10).toUpperCase();
-  }
-  function add(ticket){
-    const arr = load();
-    arr.push(ticket);
-    save(arr);
-  }
-  function get(id){
-    return load().find(t => t.id.toUpperCase() === id.toUpperCase());
-  }
+  function load(){ try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch(e){ return []; } }
+  function save(arr){ localStorage.setItem(KEY, JSON.stringify(arr)); }
+  function genId(){ return 'BT-' + Math.random().toString(36).slice(2,10).toUpperCase(); }
+  function add(ticket){ const arr = load(); arr.push(ticket); save(arr); }
+  function get(id){ return load().find(t => t.id.toUpperCase() === id.toUpperCase()); }
   function update(id, patch){
-    const arr = load();
-    const idx = arr.findIndex(t => t.id.toUpperCase() === id.toUpperCase());
-    if (idx >= 0){
-      arr[idx] = { ...arr[idx], ...patch };
-      save(arr);
-      return arr[idx];
-    }
+    const arr = load(); const i = arr.findIndex(t => t.id.toUpperCase() === id.toUpperCase());
+    if (i >= 0){ arr[i] = { ...arr[i], ...patch }; save(arr); return arr[i]; }
     return null;
   }
 
-  // Expose small API
+  function toast(msg){
+    const el = document.getElementById('toast');
+    if (!el) return;
+    el.textContent = msg; el.style.display = 'block';
+    setTimeout(()=> el.style.display = 'none', 1800);
+  }
+
+  async function loadEvents(){
+    const res = await fetch('/events.json');
+    const events = await res.json();
+    const grid = document.getElementById('eventsGrid');
+    const select = document.getElementById('event');
+    grid.innerHTML = '';
+    select.innerHTML = '';
+    events.forEach((ev, idx) => {
+      // grid card
+      const card = document.createElement('article');
+      card.className = 'card';
+      card.innerHTML = '<img alt="'+ev.title+'" src="'+ev.image+'"/>' +
+        '<div class="pad">' +
+        '<h3>'+ev.title+'</h3>' +
+        '<div class="meta">'+ev.date+' • '+ev.place+' • '+ev.price+'</div>' +
+        '<hr>' +
+        '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
+        '<a class="btn" href="#book" onclick="window.bt.selectEvent(\''+ev.title.replace(/'/g, "\'")+'\')">Book</a>' +
+        (ev.stripe_link ? ('<a class="btn" href="'+ev.stripe_link+'" target="_blank">Stripe (test)</a>') : '') +
+        '</div>' +
+        '</div>';
+      grid.appendChild(card);
+      // select option
+      const opt = document.createElement('option');
+      opt.value = ev.title; opt.textContent = ev.title; select.appendChild(opt);
+    });
+    window.bt._events = events;
+  }
+
   window.bt = {
     store: load,
     selectEvent: function(name){
       const sel = document.getElementById('event');
-      if (sel){
-        const opt = Array.from(sel.options).find(o => o.value === name);
-        if (opt){ sel.value = name; }
-        document.getElementById('name')?.focus();
-      }
+      if (sel){ sel.value = name; document.getElementById('name')?.focus(); }
     },
+    events: ()=> window.bt._events || []
   };
 
-  // Booking page behavior
   document.addEventListener('DOMContentLoaded', function(){
+    loadEvents();
+
     const form = document.getElementById('bookingForm');
+    const stripeBtn = document.getElementById('stripeBtn');
     if (form){
       form.addEventListener('submit', function(e){
         e.preventDefault();
@@ -60,27 +73,30 @@
         const id = genId();
         const ticket = { id, event: eventName, name, email, qty, used: false, createdAt: new Date().toISOString() };
         add(ticket);
-
-        // Render ticket card
-        const tMeta = document.getElementById('tMeta');
-        const tId = document.getElementById('tId');
-        const tTitle = document.getElementById('tTitle');
-        document.getElementById('ticketResult').style.display = 'block';
-        tTitle.textContent = 'Your QR e‑ticket';
-        tMeta.textContent = eventName + ' • ' + name + ' • ' + qty + ' ticket' + (qty>1?'s':'');
-        tId.textContent = id;
-        document.getElementById('tStatus').textContent = 'Valid';
-
-        // QR payload
-        const payload = JSON.stringify({ ticket_id: id, event: eventName, name, qty });
-        const qr = document.getElementById('qrcode');
-        qr.innerHTML = '';
-        new QRCode(qr, { text: payload, width: 220, height: 220 });
-        window.location.hash = '#book';
+        toast('Ticket created');
+        // Simulate payment by redirecting to success page with ticket details
+        const qs = new URLSearchParams({ id, event: eventName, name, email, qty: String(qty) });
+        location.href = '/success?'+qs.toString();
+      });
+    }
+    if (stripeBtn){
+      stripeBtn.addEventListener('click', function(){
+        const eventName = document.getElementById('event').value;
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const qty = parseInt(document.getElementById('qty').value || '1', 10);
+        // Find Stripe link for selected event
+        const ev = (window.bt.events().find(e => e.title === eventName) || {});
+        if (ev.stripe_link){
+          // Append success params so Stripe can redirect back (manually set success url on Stripe Payment Link to /success)
+          location.href = ev.stripe_link;
+        } else {
+          alert('No Stripe link set for this event yet. Use Test Payment instead or add a link in events.json.');
+        }
       });
     }
 
-    // Check‑in behavior
+    // Check-in logic (shared)
     const checkForm = document.getElementById('checkForm');
     const markUsedBtn = document.getElementById('markUsed');
     if (checkForm){
@@ -113,7 +129,6 @@
         rQty.textContent = String(t.qty);
         rStatus.innerHTML = t.used ? '<span class="used">Used</span>' : '<span class="valid">Valid</span>';
 
-        // Pre-fill for markUsed
         document.getElementById('ticketId').value = t.id;
       });
 

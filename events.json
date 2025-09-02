@@ -1,0 +1,26 @@
+[
+  {
+    "title": "Thimphu Music Night",
+    "date": "Fri, Dec 12",
+    "place": "Clock Tower Square",
+    "price": "Nu. 299",
+    "image": "https://images.unsplash.com/photo-1533929736458-ca588d08c8be?q=80&w=1200&auto=format&fit=crop",
+    "stripe_link": ""  // Paste your Stripe Payment Link here (test mode)
+  },
+  {
+    "title": "Punakha Winter Fest",
+    "date": "Sat, Dec 20",
+    "place": "Punakha Dzong Grounds",
+    "price": "Nu. 199",
+    "image": "https://images.unsplash.com/photo-1528892952291-009c663ce843?q=80&w=1200&auto=format&fit=crop",
+    "stripe_link": ""
+  },
+  {
+    "title": "Paro Film Night",
+    "date": "Sun, Dec 28",
+    "place": "Paro Town Hall",
+    "price": "Nu. 249",
+    "image": "https://images.unsplash.com/photo-1517602302552-471fe67acf66?q=80&w=1200&auto=format&fit=crop",
+    "stripe_link": ""
+  }
+]
