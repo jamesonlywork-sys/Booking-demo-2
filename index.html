@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Booking.bt — Fast, simple ticketing</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;">
+      <div class="brand">Booking<span style="color:var(--accent)">.bt</span></div>
+      <nav class="nav">
+        <a href="#events">Events</a>
+        <a href="#book">Book</a>
+        <a href="checkin.html">Check‑in</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <span class="badge">MVP Demo</span>
+        <h1>Sell, Book & Scan tickets — in minutes</h1>
+        <p>Clean, mobile‑friendly checkout with QR e‑tickets. This demo runs fully in your browser — no server, no payments — perfect for showing organizers and investors.</p>
+        <div class="cta">
+          <a class="btn primary" href="#book">Create a demo ticket</a>
+          <a class="btn" href="#events">Browse events</a>
+          <a class="btn accent" href="checkin.html">Open check‑in</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section container" id="events">
+      <h2>Events</h2>
+      <div class="grid">
+        <article class="card">
+          <h3>Thimphu Music Night</h3>
+          <div class="meta">Fri, Dec 12 • Clock Tower Square • Nu. 299</div>
+          <hr>
+          <a class="btn" href="#book" onclick="window.bt.selectEvent('Thimphu Music Night')">Book Now</a>
+        </article>
+        <article class="card">
+          <h3>Punakha Winter Fest</h3>
+          <div class="meta">Sat, Dec 20 • Punakha Dzong Grounds • Nu. 199</div>
+          <hr>
+          <a class="btn" href="#book" onclick="window.bt.selectEvent('Punakha Winter Fest')">Book Now</a>
+        </article>
+        <article class="card">
+          <h3>Paro Film Night</h3>
+          <div class="meta">Sun, Dec 28 • Paro Town Hall • Nu. 249</div>
+          <hr>
+          <a class="btn" href="#book" onclick="window.bt.selectEvent('Paro Film Night')">Book Now</a>
+        </article>
+      </div>
+    </section>
+
+    <section class="section container" id="book">
+      <h2>Create a demo ticket</h2>
+      <p class="notice">No real payments or emails are sent. This saves tickets to your browser so you can test the check‑in flow.</p>
+      <form id="bookingForm" class="form">
+        <label for="event">Event</label>
+        <select id="event" required>
+          <option value="Thimphu Music Night">Thimphu Music Night</option>
+          <option value="Punakha Winter Fest">Punakha Winter Fest</option>
+          <option value="Paro Film Night">Paro Film Night</option>
+        </select>
+
+        <label for="name">Full name</label>
+        <input id="name" type="text" required placeholder="Your name" />
+
+        <label for="email">Email <span class="small">(for demo only)</span></label>
+        <input id="email" type="email" required placeholder="name@example.com" />
+
+        <label for="qty">Tickets</label>
+        <input id="qty" type="number" min="1" max="6" value="1" required />
+
+        <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap;">
+          <button type="submit" class="btn primary">Confirm (demo)</button>
+          <a class="btn" href="checkin.html">Open check‑in</a>
+        </div>
+      </form>
+
+      <div id="ticketResult" class="card" style="display:none;margin-top:16px;">
+        <div class="kicker">Ticket created</div>
+        <h3 id="tTitle" style="margin:6px 0 0;">Your QR e‑ticket</h3>
+        <p class="meta" id="tMeta"></p>
+        <div class="qr" id="qrcode"></div>
+        <p class="small">Scan with any QR reader to see the Ticket ID. You can validate this ticket on the Check‑in page.</p>
+        <table class="table" style="margin-top:10px;">
+          <tr><th>Ticket ID</th><td id="tId"></td></tr>
+          <tr><th>Status</th><td><span id="tStatus" class="valid">Valid</span></td></tr>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    Demo only • © Booking.bt
+  </footer>
+
+  <script src="qrcode.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
